@@ -15,7 +15,7 @@ def main() -> None:
     """Runs the function to distribute the package."""
 
     setup(
-        package="project",
+        package="spinneroo",
         project="pyproject.toml",
         exclude=[
             "__pycache__",
@@ -24,15 +24,16 @@ def main() -> None:
         include=[],
         requirements="requirements.txt",
         dev_requirements="requirements-dev.txt",
-        name='project',
+        name='spinneroo',
         version='0.0.0',
         description=(
-            "A repo for project template."
+            "A module for displaying progress messages and "
+            "timers with spinners in the command line."
         ),
         license='MIT',
         author="Shahaf Frank-Shapir",
         author_email='shahaffrs@gmail.com',
-        url='https://github.com/Shahaf-F-S/auto-screener',
+        url='https://github.com/Shahaf-F-S/spinneroo',
         long_description_content_type="text/markdown",
         classifiers=[
             "Intended Audience :: Developers",

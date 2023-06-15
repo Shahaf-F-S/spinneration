@@ -1,6 +1,6 @@
-# project-template
+# spinneroo
 
-> A repo for project template.
+> A module for displaying progress messages and timers with spinners in the command line.
 
 first of all
 ------------

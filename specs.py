@@ -585,7 +585,7 @@ def main() -> None:
     """Runs the inspection of the package."""
 
     project_specs(
-        location="project", excluded_names=["__pycache__"],
+        location="spinneroo", excluded_names=["__pycache__"],
         excluded_extensions=[".pyc"], code_file_extensions=[".py"],
         content_file_extensions=[], save=True
     )

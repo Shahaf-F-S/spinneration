@@ -1,6 +1,6 @@
 # save.py
 
-from project.base import run_silent_command, suppress
+from spinneroo.base import run_silent_command, suppress
 
 from specs import main as specs
 from document import main as document
@@ -10,7 +10,7 @@ def main() -> None:
 
     commands = [
         (lambda: run_silent_command("python setup.py sdist")),
-        specs, lambda: document(location="project")
+        specs, lambda: document(location="spinneroo")
     ]
 
     for command in commands:

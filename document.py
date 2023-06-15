@@ -6,7 +6,7 @@ from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from typing import Optional
 
-from project.base import validate_requirement, suppress
+from spinneroo.base import validate_requirement, suppress
 
 validate_requirement("pdoc", path="pdoc3")
 
@@ -203,5 +203,5 @@ def main(
 # end main
 
 if __name__ == "__main__":
-    main(location="project", reload=True, show=False)
+    main(location="spinneroo", reload=True, show=False)
 # end if
