@@ -3,6 +3,7 @@
 import sys
 import datetime as dt
 import time
+import warnings
 from time import strftime
 from time import gmtime
 
@@ -139,25 +140,32 @@ class Spinner(BaseModel):
 
         self.message = message
         self.complete = complete
-        self.title = title or ""
-        self.delay = delay or self.DELAY
         self.silence = silence
         self.stay = stay
         self.counter = counter
         self.clean = clean
         self.elements = elements
 
-        self.spinner_generator = self.spinning_cursor()
+        self.title = title or ""
+        self.delay = delay or self.DELAY
 
-        self.running = False
+        self._paused = False
 
-        self.start = None
-        self.time = None
-        self.output = None
+        self._spinner_generator = self._spinning_cursor()
+
+        self._running = False
+
+        self.start: Optional[float] = None
+        self.time: Optional[float] = None
+        self.output: Optional[str] = None
     # end __init__
 
     def __enter__(self) -> Any:
-        """Enters the object to run the task."""
+        """
+        Enters the object to run the task.
+
+        :return: The object.
+        """
 
         self.spin()
 
@@ -189,13 +197,58 @@ class Spinner(BaseModel):
         return True
     # end __exit__
 
-    def stop(self) -> None:
+    @property
+    def paused(self) -> bool:
+        """Returns the value of the property."""
 
-        self.running = False
+        return self._paused
+    # end paused
+
+    @property
+    def running(self) -> bool:
+        """Returns the value of the property."""
+
+        return self._running
+    # end running
+
+    def pause(self) -> None:
+        """Pauses the process."""
+
+        if self.paused:
+            warnings.warn(
+                f"Attempting to pause {self} "
+                f"when the process is paused."
+            )
+        # end if
+
+        self._paused = True
+    # end pause
+
+    def unpause(self) -> None:
+        """Unpauses the process."""
+
+        if not self.paused:
+            warnings.warn(
+                f"Attempting to unpause {self} "
+                f"when the process is running."
+            )
+        # end if
+
+        self._paused = False
+    # end unpause
+
+    def stop(self) -> None:
+        """Stops the spinning process."""
+
+        self._running = False
 
         Spinner.instances.remove(self)
 
         Spinner.RUNNING = bool(Spinner.instances)
+
+        if Spinner.instances and Spinner.instances[-1].running:
+            Spinner.instances[-1].unpause()
+        # end if
 
         if self.delay:
             time.sleep(self.delay)
@@ -223,7 +276,13 @@ class Spinner(BaseModel):
     def spin(self) -> None:
         """Runs the spinner."""
 
-        self.running = True
+        if Spinner.instances and Spinner.instances[-1].running:
+            Spinner.instances[-1].pause()
+        # end if
+
+        self._running = True
+
+        Spinner.RUNNING = True
 
         self.start = time.time()
         self.time = time.time()
@@ -231,7 +290,7 @@ class Spinner(BaseModel):
         threading.Thread(target=self._run).start()
 
         Spinner.instances.append(self)
-    # end start
+    # end spin
 
     def create_message(
             self,
@@ -281,7 +340,7 @@ class Spinner(BaseModel):
         return message + " " + cursor + " "
     # end create_message
 
-    def spinning_cursor(self) -> Generator[str, None, None]:
+    def _spinning_cursor(self) -> Generator[str, None, None]:
         """
         Returns the current spinner value.
 
@@ -293,7 +352,7 @@ class Spinner(BaseModel):
                 self.time = time.time()
 
                 if self.silence:
-                    continue
+                    yield ""
                 # end if
 
                 self.output = self.create_message(
@@ -303,9 +362,9 @@ class Spinner(BaseModel):
                 yield self.output
             # end for
         # end while
-    # end spinning_cursor
+    # end _spinning_cursor
 
-    def _run(self) -> None:
+    def step(self) -> None:
         """Runs the spinning wheel."""
 
         delay = self.delay
@@ -314,28 +373,43 @@ class Spinner(BaseModel):
             delay = delay.total_seconds()
         # end if
 
+        next_output = ""
+
+        if not self.paused:
+            next_output = next(self._spinner_generator)
+
+            sys.stdout.write(next_output)
+            sys.stdout.flush()
+        # end if
+
+        if delay:
+            time.sleep(delay)
+        # end if
+
+        if not self.paused:
+            sys.stdout.write('\b' * len(next_output))
+            sys.stdout.flush()
+        # end if
+    # end step
+
+    def _run(self) -> None:
+        """Runs the spinning wheel."""
+
+        sys.stdout.write(
+            ('\b' * 200)
+        )
+        sys.stdout.flush()
+
         while (
-            self.running and
+            self._running and
             (
                 (self.stay is None) or
                 (callable(self.stay) and self.stay())
             )
         ):
-            Spinner.RUNNING = True
-
-            next_output = next(self.spinner_generator)
-
-            sys.stdout.write(next_output)
-            sys.stdout.flush()
-
-            if delay:
-                time.sleep(delay)
-            # end if
-
-            sys.stdout.write('\b' * len(next_output) * 2)
-            sys.stdout.flush()
+            self.step()
         # end while
-    # end spinner_task
+    # end _run
 # end Spinner
 
 spinner = Spinner

@@ -7,16 +7,29 @@ from spinneroo import Spinners, Spinner
 def main() -> None:
     """A function to run the main test."""
 
-    spinner = Spinner(
-        title='Program', message='processing',
+    spinner1 = Spinner(
+        title='Process 1', message='processing',
         elements=Spinners.line.value['frames'],
         complete=f"complete", counter=True, clean=True
     )
-    spinner.spin()
+    spinner1.spin()
 
     time.sleep(5)
 
-    spinner.stop()
+    spinner2 = Spinner(
+        title='Process 2', message='processing',
+        elements=Spinners.line.value['frames'],
+        complete=f"complete", counter=True, clean=True
+    )
+    spinner2.spin()
+
+    time.sleep(5)
+
+    spinner2.stop()
+
+    time.sleep(5)
+
+    spinner1.stop()
 # end main
 
 if __name__ == "__main__":
