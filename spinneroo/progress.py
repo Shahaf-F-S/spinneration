@@ -148,6 +148,7 @@ class Spinner(BaseModel):
 
         self.title = title or ""
         self.delay = delay or self.DELAY
+        self.cursor = elements[0]
 
         self._paused = False
 
@@ -222,6 +223,16 @@ class Spinner(BaseModel):
         # end if
 
         self._paused = True
+
+        next_output = self.create_message(text="Paused")
+
+        sys.stdout.write(
+            ('\b' * len(self.output)) +
+            (' ' * len(self.output)) +
+            ('\b' * len(self.output)) +
+            next_output + "\n"
+        )
+        sys.stdout.flush()
     # end pause
 
     def unpause(self) -> None:
@@ -350,6 +361,8 @@ class Spinner(BaseModel):
         while True:
             for cursor in self.elements:
                 self.time = time.time()
+
+                self.cursor = cursor
 
                 if self.silence:
                     yield ""
