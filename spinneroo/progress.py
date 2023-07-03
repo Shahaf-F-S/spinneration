@@ -13,7 +13,7 @@ from typing import (
     Union, Any, Callable, Literal
 )
 
-from represent import BaseModel, Modifiers
+from represent import represent, Modifiers
 
 __all__ = [
     "Spinner",
@@ -69,7 +69,8 @@ def format_seconds(
     return message
 # end format_seconds
 
-class Spinner(BaseModel):
+@represent
+class Spinner:
     """
     A class to create a terminal spinning wheel.
 
