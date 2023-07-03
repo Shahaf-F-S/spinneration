@@ -25,7 +25,7 @@ def main() -> None:
         requirements="requirements.txt",
         dev_requirements="requirements-dev.txt",
         name='spinneroo',
-        version='1.1.0',
+        version='1.1.1',
         description=(
             "A module for displaying progress messages and "
             "timers with spinners in the command line."
