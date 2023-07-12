@@ -266,6 +266,8 @@ class Spinner:
             time.sleep(self.delay)
         # end if
 
+        self.output = self.output or ''
+
         if self.clean or self.complete:
             sys.stdout.write(
                 ('\b' * len(self.output)) +
