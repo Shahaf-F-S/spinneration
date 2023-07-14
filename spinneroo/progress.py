@@ -193,7 +193,7 @@ class Spinner:
         self.stop()
 
         if exception is not None:
-            return False
+            raise exception
         # end if
 
         return True
