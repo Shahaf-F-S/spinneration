@@ -225,15 +225,26 @@ class Spinner:
 
         self._paused = True
 
-        next_output = self.create_message(text="Paused")
+        if self.silence:
+            next_output = ''
 
-        sys.stdout.write(
-            ('\b' * len(self.output)) +
-            (' ' * len(self.output)) +
-            ('\b' * len(self.output)) +
-            next_output + "\n"
-        )
-        sys.stdout.flush()
+        else:
+            next_output = self.create_message(text="Paused")
+        # end if
+
+        if self.output and next_output:
+            sys.stdout.write(
+                (
+                    (
+                        ('\b' * len(self.output)) +
+                        (' ' * len(self.output)) +
+                        ('\b' * len(self.output))
+                    ) if self.output else ''
+                ) +
+                ((next_output + "\n") if next_output else '')
+            )
+            sys.stdout.flush()
+        # end if
     # end pause
 
     def unpause(self) -> None:
@@ -268,7 +279,7 @@ class Spinner:
 
         self.output = self.output or ''
 
-        if self.clean or self.complete:
+        if self.output and (self.clean or self.complete):
             sys.stdout.write(
                 ('\b' * len(self.output)) +
                 (' ' * len(self.output)) +
@@ -278,12 +289,19 @@ class Spinner:
         # end if
 
         if self.complete:
-            self.output = self.create_message(
-                cursor="", text=self.complete
-            )
+            if self.silence:
+                self.output = ''
 
-            sys.stdout.write(self.output + "\n")
-            sys.stdout.flush()
+            else:
+                self.output = self.create_message(
+                    cursor="", text=self.complete
+                )
+            # end if
+
+            if self.output:
+                sys.stdout.write(self.output + "\n")
+                sys.stdout.flush()
+            # end if
         # end if
     # ene stop
 
@@ -394,15 +412,17 @@ class Spinner:
         if not self.paused:
             next_output = next(self._spinner_generator)
 
-            sys.stdout.write(next_output)
-            sys.stdout.flush()
+            if not self.silence:
+                sys.stdout.write(next_output)
+                sys.stdout.flush()
+            # end if
         # end if
 
         if delay:
             time.sleep(delay)
         # end if
 
-        if not self.paused:
+        if not (self.paused or self.silence):
             sys.stdout.write('\b' * len(next_output))
             sys.stdout.flush()
         # end if
@@ -411,10 +431,12 @@ class Spinner:
     def _run(self) -> None:
         """Runs the spinning wheel."""
 
-        sys.stdout.write(
-            ('\b' * 200)
-        )
-        sys.stdout.flush()
+        if not self.silence:
+            sys.stdout.write(
+                ('\b' * 200)
+            )
+            sys.stdout.flush()
+        # end if
 
         while (
             self._running and

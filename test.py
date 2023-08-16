@@ -2,24 +2,30 @@
 
 import time
 
-from spinneroo import Spinners, Spinner
+from spinneroo import Spinner
 
 def main() -> None:
     """A function to run the main test."""
 
     spinner1 = Spinner(
-        title='Process 1', message='processing',
-        elements=Spinners.line.value['frames'],
-        complete=f"complete", counter=True, clean=True
+        title='Process 1',
+        message='processing',
+        complete="complete",
+        counter=True,
+        clean=True,
+        silence=False
     )
     spinner1.spin()
 
     time.sleep(5)
 
     spinner2 = Spinner(
-        title='Process 2', message='processing',
-        elements=Spinners.line.value['frames'],
-        complete=f"complete", counter=True, clean=True
+        title='Process 2',
+        message='processing',
+        complete="complete",
+        counter=True,
+        clean=True,
+        silence=False
     )
     spinner2.spin()
 
