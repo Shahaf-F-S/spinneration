@@ -4,9 +4,7 @@ import sys
 import datetime as dt
 import time
 import warnings
-from time import strftime
-from time import gmtime
-
+from time import strftime, gmtime
 import threading
 from typing import (
     Optional, Type, Generator, Iterable,
@@ -94,6 +92,8 @@ class Spinner:
     >>>     # end while
     >>> # end Spinner
     """
+
+    WARN = True
 
     modifiers = Modifiers(excluded=["spinner_generator"])
 
@@ -217,10 +217,14 @@ class Spinner:
         """Pauses the process."""
 
         if self.paused:
-            warnings.warn(
-                f"Attempting to pause {self} "
-                f"when the process is paused."
-            )
+            if self.WARN:
+                warnings.warn(
+                    f"Attempting to pause {repr(self)} "
+                    f"when the process is paused."
+                )
+            # end if
+
+            return
         # end if
 
         self._paused = True
@@ -251,10 +255,14 @@ class Spinner:
         """Unpauses the process."""
 
         if not self.paused:
-            warnings.warn(
-                f"Attempting to unpause {self} "
-                f"when the process is running."
-            )
+            if self.WARN:
+                warnings.warn(
+                    f"Attempting to unpause {repr(self)} "
+                    f"when the process is running."
+                )
+            # end if
+
+            return
         # end if
 
         self._paused = False
