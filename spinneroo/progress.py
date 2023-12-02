@@ -7,9 +7,10 @@ import warnings
 from time import strftime, gmtime
 import threading
 from typing import (
-    Optional, Type, Generator, Iterable,
-    Union, Any, Callable, Literal
+    Generator, Iterable, Any, Callable, Literal
 )
+
+from looperator import Operator
 
 from represent import represent, Modifiers
 
@@ -21,8 +22,8 @@ __all__ = [
 
 def format_seconds(
         seconds: float,
-        length: Optional[int] = None,
-        side: Optional[Literal['left', 'right', 'center']] = None) -> str:
+        length: int = None,
+        side: Literal['left', 'right', 'center'] = None) -> str:
     """
     Formats the time in seconds.
 
@@ -107,15 +108,16 @@ class Spinner:
 
     def __init__(
             self,
-            title: Optional[str] = None,
-            message: Optional[str] = None,
-            delay: Optional[Union[int, float, dt.timedelta]] = None,
-            silence: Optional[bool] = None,
-            stay: Optional[Callable[[], bool]] = None,
-            counter: Optional[bool] = False,
-            clean: Optional[bool] = True,
-            elements: Optional[Iterable[str]] = None,
-            complete: Optional[Union[bool, str]] = None
+            title: str = None,
+            message: str = None,
+            delay: float | dt.timedelta = None,
+            timeout: float | dt.timedelta | dt.datetime = None,
+            silence: bool = None,
+            stay: Callable[[], bool] = None,
+            counter: bool = False,
+            clean: bool = True,
+            elements: Iterable[str] = None,
+            complete: bool | str = None
     ) -> None:
         """
         Defines the class attributes.
@@ -123,6 +125,7 @@ class Spinner:
         :param title: The title of the process.
         :param message: The message to display.
         :param delay: The delay value.
+        :param timeout: The timeout for the process.
         :param silence: The value to hide the progress bar.
         :param stay: A function to keep or break the loop.
         :param counter: The value to add a counter of seconds to the message.
@@ -157,9 +160,14 @@ class Spinner:
 
         self._running = False
 
-        self.start: Optional[float] = None
-        self.time: Optional[float] = None
-        self.output: Optional[str] = None
+        self.start: float | None = None
+        self.time: float | None = None
+        self.output: str | None = None
+
+        self._timeout_process = Operator(
+            termination=self.stop, timeout=timeout,
+            loop=False, block=False
+        )
     # end __init__
 
     def __enter__(self) -> Any:
@@ -176,10 +184,10 @@ class Spinner:
 
     def __exit__(
             self,
-            exception_type: Type[Exception],
+            exception_type: type[Exception],
             exception: Exception,
             traceback
-    ) -> Optional[bool]:
+    ) -> bool:
         """
         Exists the spinner object and ends the task.
 
@@ -192,12 +200,19 @@ class Spinner:
 
         self.stop()
 
-        if exception is not None:
-            raise exception
-        # end if
-
-        return True
+        return exception is None
     # end __exit__
+
+    @property
+    def timeout(self) -> float | dt.timedelta | dt.datetime:
+        """
+        returns the value of the process awaiting timeout.
+
+        :return: The flag value.
+        """
+
+        return self._timeout_process.timeout_value
+    # end timeout
 
     @property
     def paused(self) -> bool:
@@ -313,8 +328,20 @@ class Spinner:
         # end if
     # ene stop
 
-    def spin(self) -> None:
-        """Runs the spinner."""
+    def spin(self, timeout: float | dt.timedelta | dt.datetime = None,) -> None:
+        """
+        Runs the spinner.
+
+        :param timeout: The timeout value.
+        """
+
+        if self.running:
+            return
+        # end if
+
+        if timeout:
+            self._timeout_process.start_timeout(timeout)
+        # end if
 
         if Spinner.instances and Spinner.instances[-1].running:
             Spinner.instances[-1].pause()
@@ -332,11 +359,7 @@ class Spinner:
         Spinner.instances.append(self)
     # end spin
 
-    def create_message(
-            self,
-            cursor: Optional[str] = None,
-            text: Optional[str] = None
-    ) -> str:
+    def create_message(self, cursor: str = None, text: str = None) -> str:
         """
         Creates the message to display.
 
