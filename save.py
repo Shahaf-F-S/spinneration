@@ -32,10 +32,6 @@ def main(project: str, silence: Optional[bool] = True) -> None:
     for command in commands:
         with suppress(silence=silence):
             command()
-        # end suppress
-    # end for
-# end main
 
 if __name__ == "__main__":
     main(project="spinneroo")
-# end if

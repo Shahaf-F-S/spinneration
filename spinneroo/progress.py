@@ -38,14 +38,12 @@ def format_seconds(
 
     if side is None:
         return message
-    # end if
 
     if length is None:
         length = len(message)
 
     else:
         length = max(length, len(message))
-    # end if
 
     length -= len(message)
 
@@ -63,10 +61,8 @@ def format_seconds(
             f"side must be one of 'left', 'right', "
             f"or 'center', not: {side}."
         )
-    # end if
 
     return message
-# end format_seconds
 
 @represent
 class Spinner:
@@ -90,8 +86,6 @@ class Spinner:
     >>> with Spinner(message="Processing")
     >>>     while True:
     >>>         pass
-    >>>     # end while
-    >>> # end Spinner
     """
 
     WARN = True
@@ -136,11 +130,9 @@ class Spinner:
 
         if complete is True:
             complete = "Complete"
-        # end if
 
         if elements is None:
             elements = self.ELEMENTS
-        # end if
 
         self.message = message
         self.complete = complete
@@ -168,7 +160,6 @@ class Spinner:
             termination=self.stop, timeout=timeout,
             loop=False, block=False
         )
-    # end __init__
 
     def __enter__(self) -> Any:
         """
@@ -180,7 +171,6 @@ class Spinner:
         self.spin()
 
         return self
-    # end __enter__
 
     def __exit__(
             self,
@@ -201,7 +191,6 @@ class Spinner:
         self.stop()
 
         return exception is None
-    # end __exit__
 
     @property
     def timeout(self) -> float | dt.timedelta | dt.datetime:
@@ -212,21 +201,18 @@ class Spinner:
         """
 
         return self._timeout_process.timeout_value
-    # end timeout
 
     @property
     def paused(self) -> bool:
         """Returns the value of the property."""
 
         return self._paused
-    # end paused
 
     @property
     def running(self) -> bool:
         """Returns the value of the property."""
 
         return self._running
-    # end running
 
     def pause(self) -> None:
         """Pauses the process."""
@@ -237,10 +223,8 @@ class Spinner:
                     f"Attempting to pause {repr(self)} "
                     f"when the process is paused."
                 )
-            # end if
 
             return
-        # end if
 
         self._paused = True
 
@@ -249,7 +233,6 @@ class Spinner:
 
         else:
             next_output = self.create_message(text="Paused")
-        # end if
 
         if self.output and next_output:
             sys.stdout.write(
@@ -263,8 +246,6 @@ class Spinner:
                 ((next_output + "\n") if next_output else '')
             )
             sys.stdout.flush()
-        # end if
-    # end pause
 
     def unpause(self) -> None:
         """Unpauses the process."""
@@ -275,13 +256,10 @@ class Spinner:
                     f"Attempting to unpause {repr(self)} "
                     f"when the process is running."
                 )
-            # end if
 
             return
-        # end if
 
         self._paused = False
-    # end unpause
 
     def stop(self) -> None:
         """Stops the spinning process."""
@@ -294,11 +272,9 @@ class Spinner:
 
         if Spinner.instances and Spinner.instances[-1].running:
             Spinner.instances[-1].unpause()
-        # end if
 
         if self.delay:
             time.sleep(self.delay)
-        # end if
 
         self.output = self.output or ''
 
@@ -309,7 +285,6 @@ class Spinner:
                 ('\b' * len(self.output))
             )
             sys.stdout.flush()
-        # end if
 
         if self.complete:
             if self.silence:
@@ -319,13 +294,10 @@ class Spinner:
                 self.output = self.create_message(
                     cursor="", text=self.complete
                 )
-            # end if
 
             if self.output:
                 sys.stdout.write(self.output + "\n")
                 sys.stdout.flush()
-            # end if
-        # end if
     # ene stop
 
     def spin(self, timeout: float | dt.timedelta | dt.datetime = None,) -> None:
@@ -337,15 +309,12 @@ class Spinner:
 
         if self.running:
             return
-        # end if
 
         if timeout:
             self._timeout_process.start_timeout(timeout)
-        # end if
 
         if Spinner.instances and Spinner.instances[-1].running:
             Spinner.instances[-1].pause()
-        # end if
 
         self._running = True
 
@@ -357,7 +326,6 @@ class Spinner:
         threading.Thread(target=self._run).start()
 
         Spinner.instances.append(self)
-    # end spin
 
     def create_message(self, cursor: str = None, text: str = None) -> str:
         """
@@ -379,7 +347,6 @@ class Spinner:
 
         else:
             message += ": "
-        # end if
 
         message += text
 
@@ -388,20 +355,16 @@ class Spinner:
 
         else:
             message += " "
-        # end if
 
         if self.counter:
             current = self.time - self.start
 
             message += format_seconds(current)
-        # end if
 
         if not cursor:
             return message + " "
-        # end if
 
         return message + " " + cursor + " "
-    # end create_message
 
     def _spinning_cursor(self) -> Generator[str, None, None]:
         """
@@ -418,16 +381,12 @@ class Spinner:
 
                 if self.silence:
                     yield ""
-                # end if
 
                 self.output = self.create_message(
                     cursor=cursor, text=self.message
                 )
 
                 yield self.output
-            # end for
-        # end while
-    # end _spinning_cursor
 
     def step(self) -> None:
         """Runs the spinning wheel."""
@@ -436,7 +395,6 @@ class Spinner:
 
         if isinstance(delay, dt.timedelta):
             delay = delay.total_seconds()
-        # end if
 
         next_output = ""
 
@@ -446,18 +404,13 @@ class Spinner:
             if not self.silence:
                 sys.stdout.write(next_output)
                 sys.stdout.flush()
-            # end if
-        # end if
 
         if delay:
             time.sleep(delay)
-        # end if
 
         if not (self.paused or self.silence):
             sys.stdout.write('\b' * len(next_output))
             sys.stdout.flush()
-        # end if
-    # end step
 
     def _run(self) -> None:
         """Runs the spinning wheel."""
@@ -467,7 +420,6 @@ class Spinner:
                 ('\b' * 200)
             )
             sys.stdout.flush()
-        # end if
 
         while (
             self._running and
@@ -477,8 +429,5 @@ class Spinner:
             )
         ):
             self.step()
-        # end while
-    # end _run
-# end Spinner
 
 spinner = Spinner

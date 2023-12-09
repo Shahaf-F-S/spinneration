@@ -36,8 +36,6 @@ def main() -> None:
     time.sleep(5)
 
     spinner1.stop()
-# end main
 
 if __name__ == "__main__":
     main()
-# end if
