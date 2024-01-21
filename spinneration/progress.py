@@ -12,8 +12,6 @@ from typing import (
 
 from looperation import Operator
 
-from represent import represent, Modifiers
-
 __all__ = [
     "Spinner",
     "spinner",
@@ -64,7 +62,6 @@ def format_seconds(
 
     return message
 
-@represent
 class Spinner:
     """
     A class to create a terminal spinning wheel.
@@ -89,8 +86,6 @@ class Spinner:
     """
 
     WARN = True
-
-    modifiers = Modifiers(excluded=["spinner_generator"])
 
     RUNNING = False
 
