@@ -2,7 +2,7 @@
 
 import time
 
-from spinneroo import Spinner
+from spinneration import Spinner
 
 def main() -> None:
     """A function to run the main test."""

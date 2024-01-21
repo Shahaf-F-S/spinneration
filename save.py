@@ -34,4 +34,4 @@ def main(project: str, silence: Optional[bool] = True) -> None:
             command()
 
 if __name__ == "__main__":
-    main(project="spinneroo")
+    main(project="spinneration")
