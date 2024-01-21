@@ -1,3 +1,2 @@
-pyrepresent
 spinners
-looperator
+looperation

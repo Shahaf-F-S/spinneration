@@ -10,7 +10,7 @@ from typing import (
     Generator, Iterable, Any, Callable, Literal
 )
 
-from looperator import Operator
+from looperation import Operator
 
 from represent import represent, Modifiers
 
