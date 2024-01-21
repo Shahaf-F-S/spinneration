@@ -2,40 +2,51 @@
 
 > A module for displaying progress messages and timers with spinners in the command line.
 
-first of all
-------------
+## Installation
+```
+pip install spinneration
+```
 
-#### specifics:
+## example
+```python
+import time
 
-- writen and owned by: Shahaf Frank-Shapir
-- all the rights are saved for: Shahaf Frank-Shapir
-- programming languages: python 3.9.12 (100%)
+from spinneration import Spinner
 
-before we start
----------------
+spinner1 = Spinner(
+    title='Process 1',
+    message='processing',
+    complete="complete",
+    counter=True,
+    clean=True,
+    silence=False
+)
+spinner1.spin()
 
-#### description:
+time.sleep(5)
 
-- visit the docs to learn more about this project and how to develop with it.
+spinner2 = Spinner(
+    title='Process 2',
+    message='processing',
+    complete="complete",
+    counter=True,
+    clean=True,
+    silence=False
+)
+spinner2.spin()
 
-#### dependencies:
+time.sleep(5)
 
-- opening:
-  As for this is a really complex program, which uses a lot of modules, there are required dependencies needed
-  in order to run the program. keep in mined the program was writen in python 3.9, so any python version lower
-  than 3.8 might not work properly. Moreover, built-in python modules are being used, so keep that in mind.
+spinner2.stop()
 
-- install app dependencies by writing the "-r" option to install the requirements
-  writen in a file, and write the following line in the project directory:
-````
-pip install -r requirements.txt
-````
+time.sleep(5)
 
-run a test
------------
+spinner1.stop()
+```
 
-#### run from windows command line (inside the project directory)
-- run with python by writing to the command line in the project directory:
-````
-python test.py
-````
+final output
+```
+Process 1: Paused 00:00:05       
+Process 2: complete 00:00:05     
+Process 1: complete 00:00:15
+```
